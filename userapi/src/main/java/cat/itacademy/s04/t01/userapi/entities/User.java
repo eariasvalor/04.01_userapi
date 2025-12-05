@@ -8,6 +8,12 @@ public class User {
     private String email;
 
     public User(UUID id, String name, String email) {
+        if (name.isEmpty()) {
+            throw new IllegalArgumentException("The name cannot be empty.");
+        }
+        if (email == null || email.isEmpty() || !email.contains("@")) {
+            throw new IllegalArgumentException("The email is invalid.");
+        }
         this.id = id;
         this.name = name;
         this.email = email;
