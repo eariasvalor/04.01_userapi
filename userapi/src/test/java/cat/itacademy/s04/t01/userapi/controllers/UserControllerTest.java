@@ -9,7 +9,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
-import org.springframework.test.web.servlet.ResultMatcher;
 
 import java.util.UUID;
 
@@ -18,6 +17,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
 
 
 @WebMvcTest(UserController.class)
@@ -82,14 +82,29 @@ class UserControllerTest {
     }
 
     @Test
-    void getUserById_returnsNotFoundIfMissing() {
-        // Simula GET /users/{id} amb un id aleatori
-        // Espera 404
-    }
+    void getUserById_returnsNotFoundIfMissing() throws Exception {
+        UUID randomId = UUID.randomUUID();
+        mockMvc.perform(get("/users/{id}", randomId))
+                .andExpect(status().isNotFound());
+            }
 
     @Test
-    void getUsers_withNameParam_returnsFilteredUsers() {
-        // Afegeix dos usuaris amb POST
-        // Fa GET /users?name=jo i comprova que només torni els que contenen "jo"
+    void getUsers_withNameParam_returnsFilteredUsers() throws Exception {
+        User user1 = new User(null, "Joan", "joan@gmail.com");
+        User user2 = new User(null, "María", "mawi@gmail.com");
+
+        mockMvc.perform(post("/users")
+                        .contentType(String.valueOf(MediaType.APPLICATION_JSON))
+                        .content(objectMapper.writeValueAsString(user1)))
+                .andExpect(status().isOk());
+        mockMvc.perform(post("/users")
+                        .contentType(String.valueOf(MediaType.APPLICATION_JSON))
+                        .content(objectMapper.writeValueAsString(user2)))
+                .andExpect(status().isOk());
+
+        mockMvc.perform(get("/users").param("name", "jo"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].name").value("Joan"));
+
     }
 }
