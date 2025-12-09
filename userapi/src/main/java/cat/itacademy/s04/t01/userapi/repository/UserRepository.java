@@ -1,4 +1,4 @@
-package cat.itacademy.s04.t01.userapi.Repository;
+package cat.itacademy.s04.t01.userapi.repository;
 
 import cat.itacademy.s04.t01.userapi.entities.User;
 

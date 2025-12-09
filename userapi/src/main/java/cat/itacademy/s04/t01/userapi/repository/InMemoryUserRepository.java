@@ -1,23 +1,27 @@
-package cat.itacademy.s04.t01.userapi.Repository;
+package cat.itacademy.s04.t01.userapi.repository;
 
 import cat.itacademy.s04.t01.userapi.entities.User;
-import cat.itacademy.s04.t01.userapi.exceptions.UserNotFoundException;
 import org.springframework.stereotype.Repository;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 @Repository
 public class InMemoryUserRepository implements UserRepository {
     List<User> users = new ArrayList<>();
+    private final Map<UUID, User> storage = new HashMap<>();
 
     @Override
     public User save(User user) {
+        UUID id = user.getId();
+
         if (user == null) {
             throw new IllegalArgumentException("The user cannot be null.");
         }
+        if (id == null) {
+            id = UUID.randomUUID();
+            user.setId(id);
+        }
+
         users.add(user);
         return user;
     }
@@ -30,6 +34,9 @@ public class InMemoryUserRepository implements UserRepository {
 
     @Override
     public Optional<User> findById(UUID id) {
+        if(id == null){
+            throw new IllegalArgumentException("The id cannot be null");
+        }
         return users.stream()
                 .filter(u -> u.getId().equals(id))
                 .findFirst();
