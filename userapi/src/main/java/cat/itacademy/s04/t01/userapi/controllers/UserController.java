@@ -45,7 +45,7 @@ public class UserController {
         String lower = name.toLowerCase();
 
         return users.stream()
-                .filter(u -> u.getName().toLowerCase().contains(name))
+                .filter(u -> u.getName().toLowerCase().contains(lower))
                 .toList();
 
     }
